@@ -8,41 +8,43 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body { background: #000814; font-family: 'Inter', sans-serif; color: white; height: 100dvh; display: flex; flex-direction: column; margin: 0; overflow: hidden; }
-        #chat-window { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .ai-msg { align-self: flex-start; background: #111; padding: 12px; border-radius: 15px; max-width: 85%; font-size: 0.95rem; border: 1px solid #222; }
-        .user-msg { align-self: flex-end; background: #00b4d8; padding: 10px 15px; border-radius: 15px; max-width: 80%; font-size: 0.95rem; font-weight: 500; }
-        .bottom-nav { background: #000814; padding: 12px; border-top: 1px solid #1a1a1a; }
-        .input-box { background: #0a0a0a; border-radius: 30px; padding: 5px 15px; border: 1px solid #333; display: flex; align-items: center; }
+        #chat-window { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; }
+        .ai-msg { align-self: flex-start; background: #111; padding: 14px; border-radius: 18px 18px 18px 2px; max-width: 85%; font-size: 1rem; border: 1px solid #222; color: #f0f0f0; line-height: 1.5; }
+        .user-msg { align-self: flex-end; background: #00b4d8; padding: 12px 16px; border-radius: 18px 18px 2px 18px; max-width: 80%; font-size: 1rem; font-weight: 500; color: white; }
+        .bottom-nav { background: #000814; padding: 15px; border-top: 1px solid #1a1a1a; }
+        .input-box { background: #0a0a0a; border-radius: 30px; padding: 6px 18px; border: 1px solid #333; display: flex; align-items: center; box-shadow: 0 0 15px rgba(0, 180, 216, 0.1); }
         input { flex: 1; background: transparent; border: none; outline: none; color: white; padding: 10px; font-size: 1rem; }
-        #loading { font-size: 11px; color: #00b4d8; margin-left: 15px; display: none; }
+        #loading { font-size: 12px; color: #00b4d8; margin-left: 15px; display: none; margin-bottom: 5px; font-weight: bold; }
     </style>
 </head>
 <body>
-    <header class="p-4 border-b border-white/10 flex justify-between items-center bg-black/40 backdrop-blur-md">
-        <div class="text-cyan-400 font-bold text-xl">Smile AI Solution</div>
+
+    <header class="p-4 border-b border-white/10 flex justify-between items-center bg-black/40 backdrop-blur-md sticky top-0 z-50">
+        <div class="text-cyan-400 font-bold text-xl tracking-tight uppercase">Smile AI Solution</div>
         <div id="auth-ui">
-            <button id="login-btn" class="text-xs border border-cyan-500/50 px-4 py-1.5 rounded-full">Login</button>
+            <button id="login-btn" class="text-xs font-bold border border-cyan-500/50 px-5 py-2 rounded-full hover:bg-cyan-500/10 transition">LOGIN</button>
             <div id="user-profile" class="hidden flex items-center gap-3">
-                <img id="avatar" class="w-8 h-8 rounded-full border border-cyan-400">
-                <button id="logout-btn" class="text-[10px] text-red-500 font-bold">EXIT</button>
+                <img id="avatar" class="w-9 h-9 rounded-full border-2 border-cyan-400">
+                <button id="logout-btn" class="text-[10px] text-red-500 font-black tracking-widest">EXIT</button>
             </div>
         </div>
     </header>
 
     <div id="chat-window">
-        <div class="ai-msg">Dost, main Smile AI hoon. Batao aaj kya trouble hai?</div>
+        <div class="ai-msg">Dost, main Smile AI hoon. Tumhare personal finance ka saathi. Batao aaj kya trouble hai?</div>
     </div>
 
     <div class="bottom-nav">
-        <div id="loading">Thinking...</div>
+        <div id="loading">SMILE AI IS THINKING...</div>
         <div class="input-box">
-            <input type="text" id="user-input" placeholder="Likho yahan...">
+            <input type="text" id="user-input" placeholder="Yahan apni pareshani likho...">
             <button id="send-btn"><i class="fa-solid fa-paper-plane text-cyan-400 text-xl"></i></button>
         </div>
-        <div class="flex justify-around mt-4 pb-2">
-            <button id="mic-btn"><i class="fa-solid fa-microphone text-cyan-100 text-2xl"></i></button>
-            <button onclick="window.open('https://wa.me/?text=Check this out!')"><i class="fa-solid fa-share-nodes text-green-500 text-2xl"></i></button>
-            <button onclick="location.reload()"><i class="fa-solid fa-house text-gray-400 text-2xl"></i></button>
+        
+        <div class="flex justify-around mt-5 pb-2">
+            <button id="mic-btn" class="hover:scale-110 transition"><i class="fa-solid fa-microphone text-cyan-100 text-2xl"></i></button>
+            <button onclick="window.open('https://wa.me/?text=Bhai, ye Smile AI try kar, mast solution deta hai!')" class="hover:scale-110 transition"><i class="fa-solid fa-share-nodes text-green-500 text-2xl"></i></button>
+            <button onclick="location.reload()" class="hover:scale-110 transition"><i class="fa-solid fa-house text-gray-400 text-2xl"></i></button>
         </div>
     </div>
 
@@ -60,11 +62,11 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(auth);
+        const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
-        const KEY = "AIzaSyDJzZwjtrqEjeKzCdewT0Ie7UFB3xlz7fA";
+        const GEMINI_API = "AIzaSyDJzZwjtrqEjeKzCdewT0Ie7UFB3xlz7fA";
 
-        let voiceMode = false;
+        let voiceOn = false;
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -77,10 +79,20 @@
         document.getElementById('login-btn').onclick = () => signInWithPopup(auth, provider);
         document.getElementById('logout-btn').onclick = () => signOut(auth).then(() => location.reload());
 
+        function speak(text) {
+            if(!voiceOn) return;
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = 'hi-IN';
+            window.speechSynthesis.speak(u);
+            voiceOn = false;
+        }
+
         async function askAI(msg, mic = false) {
             const val = msg || document.getElementById('user-input').value;
             if(!val) return;
-            voiceMode = mic;
+            voiceOn = mic;
+
             const win = document.getElementById('chat-window');
             if(!msg) win.innerHTML += `<div class="user-msg">${val}</div>`;
             document.getElementById('loading').style.display = 'block';
@@ -88,18 +100,20 @@
             win.scrollTop = win.scrollHeight;
 
             try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${KEY}`, {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API}`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: `You are Smile AI. Rules: Hinglish friend. Suggest products via landing page. 99 discount on 5 shares. User: ${val}` }] }] })
+                    body: JSON.stringify({ contents: [{ parts: [{ text: `You are Smile AI, a finance expert. Rules: 1. Act like a friend. 2. Compact Hinglish. 3. Only landing page for products. 4. Refer 5 friends for 99 discount. 5. Amazon smileai24-21. User: ${val}` }] }] })
                 });
                 const data = await res.json();
                 const reply = data.candidates[0].content.parts[0].text;
+                
                 document.getElementById('loading').style.display = 'none';
                 win.innerHTML += `<div class="ai-msg">${reply}</div>`;
                 win.scrollTop = win.scrollHeight;
+                if(mic) speak(reply);
             } catch (e) {
-                document.getElementById('loading').innerText = "Network slow. Try again!";
+                document.getElementById('loading').innerText = "NETWORK ERROR. PLEASE RETRY.";
             }
         }
 
